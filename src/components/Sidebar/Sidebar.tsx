@@ -1,8 +1,9 @@
 
-import { User, Plus } from "lucide-react";
+import { User, Plus, LogOut } from "lucide-react";
 import { Conversation } from "@/types";
 import { Button } from "@/components/ui/button";
 import { ConversationList } from "./ConversationList";
+import { useAuth } from "@/context/AuthContext";
 
 interface SidebarProps {
   conversations: Conversation[];
@@ -23,6 +24,8 @@ export function Sidebar({
   onEditConversation,
   onOpenUserSettings,
 }: SidebarProps) {
+  const { user } = useAuth();
+  
   return (
     <aside className="border-r w-full max-w-[280px] h-full flex flex-col">
       <div className="p-4">
@@ -46,13 +49,23 @@ export function Sidebar({
       </div>
       
       <div className="p-3 border-t">
+        <div className="flex items-center justify-between mb-2 px-2">
+          <div className="flex items-center">
+            <div className="bg-sidebar-accent rounded-full p-1 mr-2">
+              <User size={16} />
+            </div>
+            <div className="text-sm font-medium truncate">
+              {user?.email}
+            </div>
+          </div>
+        </div>
         <Button
           variant="outline"
           className="w-full justify-start"
           onClick={onOpenUserSettings}
         >
-          <User size={16} className="mr-2" />
-          <span>Profile & Settings</span>
+          <LogOut size={16} className="mr-2" />
+          <span>Sign Out</span>
         </Button>
       </div>
     </aside>
