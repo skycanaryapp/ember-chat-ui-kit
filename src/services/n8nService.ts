@@ -13,6 +13,8 @@ export interface ChatRequestBody {
 
 export async function sendChatMessage(message: string, conversationId: string, userId?: string): Promise<string> {
   try {
+    console.log("Sending request to n8n webhook:", { message, conversationId, userId });
+    
     const response = await fetch(N8N_WEBHOOK_URL, {
       method: 'POST',
       headers: {
@@ -26,13 +28,26 @@ export async function sendChatMessage(message: string, conversationId: string, u
     });
 
     if (!response.ok) {
-      throw new Error(`Network error: ${response.status} ${response.statusText}`);
+      console.error(`Network error: ${response.status} ${response.statusText}`);
+      throw new Error(`Server responded with status: ${response.status}`);
     }
 
     const data = await response.json();
-    return data.message || 'Sorry, I could not generate a response.';
+    
+    // Debug the response
+    console.log("Received response from n8n webhook:", data);
+    
+    // Check if we have a message in the expected format
+    if (data && Array.isArray(data) && data.length > 0 && data[0].output) {
+      return data[0].output;
+    } else if (data && typeof data.message === 'string') {
+      return data.message;
+    } else {
+      console.error("Unexpected response format:", data);
+      throw new Error("The AI service returned an unexpected response format");
+    }
   } catch (error) {
     console.error('Error sending message to n8n webhook:', error);
-    throw new Error('Failed to get a response from the AI. Please try again.');
+    throw new Error('Failed to get a response from the AI. Please try again later.');
   }
 }

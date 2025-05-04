@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Sidebar } from "@/components/Sidebar/Sidebar";
@@ -224,18 +225,36 @@ const Index = () => {
 
       // Generate AI response
       setIsLoading(true);
-      const aiResponse = await sendChatMessage(
-        content,
-        currentConversationId,
-        user?.id
-      );
+      
+      try {
+        const aiResponse = await sendChatMessage(
+          content,
+          currentConversationId,
+          user?.id
+        );
 
-      // Create AI message
-      await createMessage(
-        currentConversationId,
-        aiResponse,
-        "ai"
-      );
+        // Create AI message
+        await createMessage(
+          currentConversationId,
+          aiResponse,
+          "ai"
+        );
+      } catch (error: any) {
+        console.error("AI response error:", error);
+        
+        // Create an error message to display to the user
+        await createMessage(
+          currentConversationId,
+          "I'm sorry, I couldn't process your request. The AI service might be temporarily unavailable. Please try again later.",
+          "ai"
+        );
+        
+        toast({
+          title: "AI Service Issue",
+          description: "There was a problem connecting to the AI service. We've recorded your message and will try to reconnect.",
+          variant: "destructive"
+        });
+      }
     } catch (error: any) {
       console.error("Failed to process message:", error);
       toast({

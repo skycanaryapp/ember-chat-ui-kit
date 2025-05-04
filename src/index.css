@@ -40,6 +40,10 @@
     --sidebar-accent-foreground: 222.2 47.4% 11.2%;
     --sidebar-primary: 15 100% 70%;
     --sidebar-primary-foreground: 210 40% 98%;
+    
+    /* Brand color variables */
+    --brand-orange: 12 100% 69%;
+    --brand-light-orange: 33 96% 74%;
   }
  
   .dark {
@@ -85,7 +89,7 @@
 /* Custom app styles */
 @layer components {
   .gradient-button {
-    @apply bg-gradient-to-r from-[#FF7E5F] to-[#FEB47B] text-white hover:opacity-90 transition-opacity;
+    @apply bg-gradient-to-r from-[#FF7E5F] to-[#FEB47B] text-white hover:opacity-90 transition-all;
   }
   
   .chat-gradient-border {
@@ -105,7 +109,7 @@
   }
   
   .typing-dot {
-    @apply h-2 w-2 bg-gray-400 rounded-full animate-pulse;
+    @apply inline-block h-2 w-2 bg-gray-400 rounded-full animate-pulse;
   }
   
   .typing-dot:nth-child(1) {
