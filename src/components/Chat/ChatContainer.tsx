@@ -1,10 +1,10 @@
 
-import { useState } from "react";
-import { Conversation, Message } from "@/types";
+import { Message, Conversation } from "@/types";
 import { ChatHeader } from "./ChatHeader";
 import { MessageList } from "./MessageList";
 import { MessageInput } from "./MessageInput";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { motion } from "framer-motion";
 
 interface ChatContainerProps {
   conversation: Conversation | null;
@@ -26,7 +26,12 @@ export function ChatContainer({
   const isMobile = useIsMobile();
   
   return (
-    <div className="flex-1 flex flex-col h-full overflow-hidden">
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+      className="flex-1 flex flex-col h-full overflow-hidden relative bg-zinc-50 dark:bg-zinc-900"
+    >
       <ChatHeader
         conversation={conversation}
         onEditTitle={onEditTitle}
@@ -40,6 +45,6 @@ export function ChatContainer({
         onSendMessage={onSendMessage}
         isDisabled={isLoading || !conversation}
       />
-    </div>
+    </motion.div>
   );
 }

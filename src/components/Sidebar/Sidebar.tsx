@@ -4,6 +4,7 @@ import { Conversation } from "@/types";
 import { Button } from "@/components/ui/button";
 import { ConversationList } from "./ConversationList";
 import { useAuth } from "@/context/AuthContext";
+import { motion } from "framer-motion";
 
 interface SidebarProps {
   conversations: Conversation[];
@@ -27,11 +28,16 @@ export function Sidebar({
   const { user } = useAuth();
   
   return (
-    <aside className="border-r w-full max-w-[280px] h-full flex flex-col">
+    <motion.aside
+      initial={{ x: -300 }}
+      animate={{ x: 0 }}
+      transition={{ type: "spring", bounce: 0, duration: 0.6 }}
+      className="w-full max-w-[300px] h-full flex flex-col bg-white dark:bg-zinc-900 border-r border-zinc-200 dark:border-zinc-800"
+    >
       <div className="p-4">
         <Button 
           onClick={onNewConversation}
-          className="w-full justify-start gradient-button"
+          className="w-full justify-start bg-gradient-to-r from-[#4776E6] to-[#8E54E9] hover:shadow-md transition-all duration-300 text-white font-medium"
         >
           <Plus size={16} className="mr-2" />
           New Chat
@@ -48,11 +54,11 @@ export function Sidebar({
         />
       </div>
       
-      <div className="p-3 border-t">
-        <div className="flex items-center justify-between mb-2 px-2">
-          <div className="flex items-center">
-            <div className="bg-sidebar-accent rounded-full p-1 mr-2">
-              <User size={16} />
+      <div className="p-3 border-t border-zinc-200 dark:border-zinc-800">
+        <div className="flex items-center justify-between mb-2 px-2 py-2 rounded-lg bg-zinc-50 dark:bg-zinc-800">
+          <div className="flex items-center overflow-hidden">
+            <div className="bg-gradient-to-r from-[#4776E6] to-[#8E54E9] rounded-full p-2 mr-2 flex-shrink-0">
+              <User size={16} className="text-white" />
             </div>
             <div className="text-sm font-medium truncate">
               {user?.email}
@@ -61,13 +67,13 @@ export function Sidebar({
         </div>
         <Button
           variant="outline"
-          className="w-full justify-start"
+          className="w-full justify-start mt-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
           onClick={onOpenUserSettings}
         >
           <LogOut size={16} className="mr-2" />
           <span>Sign Out</span>
         </Button>
       </div>
-    </aside>
+    </motion.aside>
   );
 }
