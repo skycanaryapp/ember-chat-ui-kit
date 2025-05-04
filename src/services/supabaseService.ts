@@ -1,6 +1,6 @@
 
 import { supabase } from "@/integrations/supabase/client";
-import { Conversation, Message } from "@/types";
+import { Conversation, Message, MessageRole } from "@/types";
 
 // Conversations
 export async function getConversations(): Promise<Conversation[]> {
@@ -14,7 +14,13 @@ export async function getConversations(): Promise<Conversation[]> {
     throw error;
   }
 
-  return data || [];
+  // Transform the data to match our application types
+  return (data || []).map(conv => ({
+    id: conv.id,
+    userId: conv.user_id,
+    title: conv.title,
+    createdAt: new Date(conv.created_at)
+  }));
 }
 
 export async function getConversation(id: string): Promise<Conversation | null> {
@@ -35,13 +41,35 @@ export async function getConversation(id: string): Promise<Conversation | null> 
     throw error;
   }
 
-  return data;
+  // Transform data to match our types
+  const conversation: Conversation = {
+    id: data.id,
+    userId: data.user_id,
+    title: data.title,
+    createdAt: new Date(data.created_at),
+    messages: data.messages ? data.messages.map((msg: any) => ({
+      id: msg.id,
+      conversationId: msg.conversation_id,
+      role: msg.role as MessageRole,
+      content: msg.content,
+      createdAt: new Date(msg.created_at)
+    })) : []
+  };
+  
+  return conversation;
 }
 
 export async function createConversation(title: string): Promise<Conversation> {
+  // Get current user ID
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error("User not authenticated");
+  
   const { data, error } = await supabase
     .from("conversations")
-    .insert([{ title }])
+    .insert([{ 
+      title, 
+      user_id: user.id 
+    }])
     .select()
     .single();
 
@@ -50,7 +78,12 @@ export async function createConversation(title: string): Promise<Conversation> {
     throw error;
   }
 
-  return data;
+  return {
+    id: data.id,
+    userId: data.user_id,
+    title: data.title,
+    createdAt: new Date(data.created_at)
+  };
 }
 
 export async function updateConversationTitle(id: string, title: string): Promise<void> {
@@ -90,16 +123,20 @@ export async function getMessages(conversationId: string): Promise<Message[]> {
     throw error;
   }
 
-  return data.map(message => ({
-    ...message,
-    createdAt: new Date(message.created_at)
-  })) || [];
+  // Transform data to match our types
+  return (data || []).map(msg => ({
+    id: msg.id,
+    conversationId: msg.conversation_id,
+    role: msg.role as MessageRole,
+    content: msg.content,
+    createdAt: new Date(msg.created_at)
+  }));
 }
 
 export async function createMessage(
   conversationId: string,
   content: string,
-  role: "user" | "ai"
+  role: MessageRole
 ): Promise<Message> {
   const { data, error } = await supabase
     .from("messages")
@@ -119,7 +156,10 @@ export async function createMessage(
   }
 
   return {
-    ...data,
+    id: data.id,
+    conversationId: data.conversation_id,
+    role: data.role as MessageRole,
+    content: data.content,
     createdAt: new Date(data.created_at)
   };
 }

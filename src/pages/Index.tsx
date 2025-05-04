@@ -1,12 +1,11 @@
-
 import { useState, useEffect } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Sidebar } from "@/components/Sidebar/Sidebar";
 import { ChatContainer } from "@/components/Chat/ChatContainer";
 import { Button } from "@/components/ui/button";
 import { MessageSquare } from "lucide-react";
-import { Conversation, Message } from "@/types";
-import { generateUUID, generateTitle } from "@/utils/helpers";
+import { Conversation, Message, MessageRole } from "@/types";
+import { generateTitle } from "@/utils/helpers";
 import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/components/ui/use-toast";
 import { 
@@ -75,7 +74,12 @@ const Index = () => {
         setConversations(prev => [newRecord, ...prev]);
       } else if (eventType === 'UPDATE') {
         setConversations(prev => 
-          prev.map(c => c.id === newRecord.id ? { ...c, ...newRecord } : c)
+          prev.map(c => c.id === newRecord.id ? { 
+            ...c, 
+            title: newRecord.title,
+            userId: newRecord.user_id,
+            createdAt: new Date(newRecord.created_at)
+          } : c)
         );
       } else if (eventType === 'DELETE') {
         setConversations(prev => prev.filter(c => c.id !== oldRecord.id));
@@ -120,7 +124,10 @@ const Index = () => {
 
       if (eventType === 'INSERT') {
         setMessages(prev => [...prev, {
-          ...newRecord,
+          id: newRecord.id,
+          conversationId: newRecord.conversation_id,
+          role: newRecord.role as MessageRole,
+          content: newRecord.content,
           createdAt: new Date(newRecord.created_at)
         }]);
       }

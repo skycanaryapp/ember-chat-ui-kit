@@ -4,22 +4,18 @@ export type MessageRole = 'user' | 'ai';
 
 export interface Message {
   id: string;
-  conversation_id?: string;
-  conversationId?: string;
+  conversationId: string;
   role: MessageRole;
   content: string;
-  created_at?: string;
   createdAt: Date;
 }
 
 // Conversation Types
 export interface Conversation {
   id: string;
-  user_id?: string;
-  userId?: string;
+  userId: string;
   title: string;
-  created_at?: string;
-  createdAt?: Date;
+  createdAt: Date;
   messages?: Message[];
 }
 
